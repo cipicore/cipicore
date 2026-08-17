@@ -1680,7 +1680,7 @@ function renderTransactions() {
     document.getElementById(
         "filteredProfit"
     ).textContent =
-        `Profit ${formatRupiah(profit)}`;
+        `Total ${formatRupiah(profit)}`;
 
 
     updateTransactionSummary();
