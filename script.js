@@ -76,6 +76,8 @@ let transactions = [];
 
 let editingAccountId = null;
 
+let editingTransactionId = null;
+
 let transactionFilter = "all";
 
 let sortNewestFirst = true;
@@ -1026,33 +1028,116 @@ function deleteAccount(id) {
    TRANSACTION MODAL
 ========================================= */
 
-function openTransactionModal() {
+function openTransactionModal(transactionId = null) {
+
+    editingTransactionId = transactionId;
 
     document
-        .getElementById(
-            "transactionModal"
-        )
+        .getElementById("transactionModal")
         .classList.add("show");
 
-
     document
-        .querySelector(
-            "#transactionModal form"
-        )
+        .querySelector("#transactionModal form")
         .reset();
-
-
-    document.getElementById(
-        "transactionDate"
-    ).value =
-        toDateInputValue(
-            new Date()
-        );
-
 
     populateTransactionAccounts();
 
-    updateTransactionCategory();
+    // MODE EDIT
+    if (transactionId) {
+
+        const transaction =
+            transactions.find(
+                function(item) {
+                    return Number(item.id) ===
+                        Number(transactionId);
+                }
+            );
+
+        if (!transaction) {
+            return;
+        }
+
+        // Kalau ada judul modal, ubah jadi Edit Transaksi
+        const title =
+            document.getElementById(
+                "transactionModalTitle"
+            );
+
+        if (title) {
+            title.textContent =
+                "Edit Transaksi";
+        }
+
+        document.getElementById(
+            "transactionDate"
+        ).value =
+            transaction.date || "";
+
+        document.getElementById(
+            "transactionType"
+        ).value =
+            transaction.type;
+
+        // Update pilihan kategori dulu
+        updateTransactionCategory();
+
+        document.getElementById(
+            "transactionCategory"
+        ).value =
+            transaction.category;
+
+        document.getElementById(
+            "transactionAccount"
+        ).value =
+            transaction.accountId
+                ? transaction.accountId
+                : "";
+
+        document.getElementById(
+            "transactionRobux"
+        ).value =
+            transaction.robux || "";
+
+        document.getElementById(
+            "transactionAmount"
+        ).value =
+            transaction.amount || "";
+
+        document.getElementById(
+            "transactionMethod"
+        ).value =
+            transaction.method || "";
+
+        document.getElementById(
+            "transactionNote"
+        ).value =
+            transaction.note || "";
+
+    }
+
+    // MODE ADD
+    else {
+
+        const title =
+            document.getElementById(
+                "transactionModalTitle"
+            );
+
+        if (title) {
+            title.textContent =
+                "Tambah Transaksi";
+        }
+
+        document.getElementById(
+            "transactionDate"
+        ).value =
+            toDateInputValue(
+                new Date()
+            );
+
+        updateTransactionCategory();
+
+    }
 
 }
 
@@ -1066,6 +1151,8 @@ function closeTransactionModal() {
         .classList.remove(
             "show"
         );
+
+    editingTransactionId = null;
 
 }
 
@@ -1186,7 +1273,6 @@ async function saveTransaction(event) {
     event.preventDefault();
 
     const transaction = {
-        id: Date.now(),
 
         date:
             document.getElementById(
@@ -1237,28 +1323,78 @@ async function saveTransaction(event) {
             document.getElementById(
                 "transactionNote"
             ).value.trim()
+
     };
 
 
-    const { error } =
-        await supabaseClient
-            .from("transactions")
-            .insert(transaction);
+    // =========================================
+    // EDIT TRANSAKSI
+    // =========================================
+
+    if (editingTransactionId) {
+
+        const { error } =
+            await supabaseClient
+                .from("transactions")
+                .update(transaction)
+                .eq(
+                    "id",
+                    Number(editingTransactionId)
+                );
+
+        if (error) {
+
+            console.error(
+                "Gagal mengupdate transaksi:",
+                error
+            );
+
+            alert(
+                "Gagal mengupdate transaksi: " +
+                error.message
+            );
+
+            return;
+        }
+
+    }
+
+    // =========================================
+    // TAMBAH TRANSAKSI
+    // =========================================
+
+    else {
+
+        const newTransaction = {
+
+            id: Date.now(),
+
+            ...transaction
+
+        };
 
 
-    if (error) {
+        const { error } =
+            await supabaseClient
+                .from("transactions")
+                .insert(newTransaction);
 
-        console.error(
-            "Gagal menyimpan transaksi:",
-            error
-        );
 
-        alert(
-            "Gagal menyimpan transaksi: " +
-            error.message
-        );
+        if (error) {
 
-        return;
+            console.error(
+                "Gagal menyimpan transaksi:",
+                error
+            );
+
+            alert(
+                "Gagal menyimpan transaksi: " +
+                error.message
+            );
+
+            return;
+        }
+
     }
 
 
@@ -1620,14 +1756,25 @@ function renderTransactions() {
 
                         <td>
 
-                            <button
-                                class="icon-button"
-                                onclick="deleteTransaction('${transaction.id}')"
-                            >
-                                ×
-                            </button>
+    <div class="action-cell">
 
-                        </td>
+        <button
+            class="icon-button"
+            onclick="openTransactionModal('${transaction.id}')"
+        >
+            ✎
+        </button>
+
+        <button
+            class="icon-button"
+            onclick="deleteTransaction('${transaction.id}')"
+        >
+            ×
+        </button>
+
+    </div>
+
+</td>
 
                     </tr>
 
