@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipiCore</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="pinScreen" class="pin-screen">
+    <div class="pin-box">
+        <h2>CipiCore</h2>
+        <p>hai, masukin PIN dulu ya!</p>
+
+        <input
+            type="password"
+            id="pinInput"
+            inputmode="numeric"
+            maxlength="6"
+            placeholder="••••••"
+        >
+
+        <button
+            class="primary-button"
+            onclick="unlockCipiCore()"
+        >
+            Masuk
+        </button>
+
+        <p id="pinError" class="pin-error"></p>
+    </div>
+</div>
+
+<div id="appContent">
+
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-logo">
+            <img src="avatar.jpg" alt="CipiCore">
+         </div>
+
+        <div>
+            <h1>CipiCore</h1>
+            <span>v2.1.1</span>
+        </div>
+    </div>
+
+    <nav>
+        <button class="nav-button active"
+                onclick="showPage('dashboard', this)">
+            Dashboard
+        </button>
+
+        <button class="nav-button"
+                onclick="showPage('transactions', this)">
+            Transaksi
+        </button>
+    </nav>
+
+    <div class="profile">
+        <span>pacarnyagojo</span>
+        <small>● Active</small>
+    </div>
+
+</header>
+
+
+<main>
+
+    <!-- =========================
+         DASHBOARD
+    ========================== -->
+
+    <section id="dashboardPage" class="page active-page">
+
+        <div class="page-title">
+            <h2>Dashboard</h2>
+        </div>
+
+        <div class="summary-grid">
+
+            <div class="summary-card accent-card">
+                <span>Total Saldo</span>
+
+                <strong id="dashboardBalance">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>Total Pemasukan</span>
+
+                <strong id="dashboardIncome">
+                    Rp 0
+                </strong>
+
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>Total Pengeluaran</span>
+
+                <strong id="dashboardExpense">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>Profit Bersih</span>
+
+                <strong id="dashboardProfit">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>Total Robux</span>
+
+                <strong id="dashboardRobux">
+                    0 R$
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNTS -->
+
+        <div class="content-card">
+
+            <div class="content-header">
+
+                <div>
+                    <h3>Akun yang Dihandle</h3>
+
+                    <p>
+                        <span id="accountCount">0</span>
+                        akun terdaftar
+                    </p>
+                </div>
+
+
+                <div class="header-actions">
+
+                    <div class="search-box">
+
+                        <span>⌕</span>
+
+                        <input
+                            type="text"
+                            id="accountSearch"
+                            placeholder="Cari akun..."
+                            oninput="renderAccounts()"
+                        >
+
+                    </div>
+
+
+                    <button
+                        class="primary-button"
+                        onclick="openAccountModal()"
+                    >
+                        + Add Account
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Username</th>
+                            <th>Display Name</th>
+                            <th>Email</th>
+                            <th>Renew Plus</th>
+                            <th>Pertama Send</th>
+                            <th>Terakhir Send</th>
+                            <th>Next Available</th>
+                            <th>Sisa Robux</th>
+                            <th></th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="accountsTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         TRANSACTIONS
+    ========================== -->
+
+    <section id="transactionsPage" class="page">
+
+        <div class="page-title">
+
+            <h2>Transaksi</h2>
+
+            <p>
+                
+            </p>
+
+        </div>
+
+
+        <div class="transaction-summary">
+
+            <div class="transaction-card">
+
+                <span>Total Pemasukan</span>
+
+                <strong id="totalIncome">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-card">
+
+                <span>Total Pengeluaran</span>
+
+                <strong id="totalExpense">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-card">
+
+                <span>Profit Bersih</span>
+
+                <strong id="totalProfit">
+                    Rp 0
+                </strong>
+
+            </div>
+
+
+            <div class="transaction-card">
+
+                <span>Total Robux Dibeli</span>
+
+                <strong
+                    class="green-text"
+                    id="totalRobuxBought"
+                >
+                    0 R$
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="transaction-controls">
+
+            <div class="filter-buttons">
+
+                <button
+                    class="filter-button active"
+                    onclick="setTransactionType('all', this)"
+                >
+                    Semua
+                </button>
+
+                <button
+                    class="filter-button"
+                    onclick="setTransactionType('income', this)"
+                >
+                    Pemasukan
+                </button>
+
+                <button
+                    class="filter-button"
+                    onclick="setTransactionType('expense', this)"
+                >
+                    Pengeluaran
+                </button>
+
+            </div>
+
+
+            <div class="transaction-actions">
+
+                <div class="date-filter">
+
+                    <label>Dari</label>
+
+                    <input
+                        type="date"
+                        id="dateFrom"
+                        onchange="refreshTransactions()"
+                    >
+
+                    <label>Sampai</label>
+
+                    <input
+                        type="date"
+                        id="dateTo"
+                        onchange="refreshTransactions()"
+                    >
+
+                </div>
+
+
+                <button
+                    class="sort-button"
+                    id="sortButton"
+                    onclick="toggleSort()"
+                >
+                    Tanggal ↓
+                </button>
+
+
+                <button
+                    class="primary-button"
+                    onclick="openTransactionModal()"
+                >
+                    + Transaksi
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="content-card">
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Kategori</th>
+                            <th>Akun</th>
+                            <th>Robux</th>
+                            <th>Nominal</th>
+                            <th>Metode</th>
+                            <th>Keterangan</th>
+                            <th></th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="transactionsTable"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="table-footer">
+
+                <span id="transactionCount">
+                    0 transaksi
+                </span>
+
+                <strong id="filteredProfit">
+                    Profit Rp 0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+
+<!-- =========================
+     ACCOUNT MODAL
+========================== -->
+
+<div id="accountModal" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="accountModalTitle">
+                    Add Account
+                </h3>
+
+                <p>
+                    Tambahkan data akun yang kamu handle
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-button"
+                onclick="closeAccountModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form onsubmit="saveAccount(event)">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Username</label>
+
+                    <input
+                        type="text"
+                        id="accountUsername"
+                        placeholder="Username Roblox"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Display Name</label>
+
+                    <input
+                        type="text"
+                        id="accountDisplayName"
+                        placeholder="Display Name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        id="accountEmail"
+                        placeholder="Email akun"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Subscribe Pertama</label>
+
+                    <input
+                        type="date"
+                        id="accountSubscriptionStart"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Renew Mode</label>
+
+                    <select id="accountRenewMode">
+
+                        <option value="auto">
+                            Automatic
+                        </option>
+
+                        <option value="manual">
+                            Manual
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    class="form-group"
+                    id="manualRenewGroup"
+                >
+
+                    <label>Next Renew Manual</label>
+
+                    <input
+                        type="date"
+                        id="accountManualRenew"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Pertama Kali Send</label>
+
+                    <input
+                        type="date"
+                        id="accountFirstSend"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Terakhir Send</label>
+
+                    <input
+                        type="date"
+                        id="accountLastSend"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Sisa Robux</label>
+
+                    <input
+                        type="number"
+                        id="accountRobux"
+                        min="0"
+                        placeholder="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="closeAccountModal()"
+                >
+                    Batal
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Simpan Account
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     TRANSACTION MODAL
+========================== -->
+
+<div id="transactionModal" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3>
+                    Tambah Transaksi
+                </h3>
+
+                <p>
+                    Catat pemasukan atau pengeluaran
+                </p>
+
+            </div>
+
+
+            <button
+                class="close-button"
+                onclick="closeTransactionModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form onsubmit="saveTransaction(event)">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Tanggal</label>
+
+                    <input
+                        type="date"
+                        id="transactionDate"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Jenis Transaksi</label>
+
+                    <select
+                        id="transactionType"
+                        onchange="updateTransactionCategory()"
+                    >
+
+                        <option value="income">
+                            Pemasukan
+                        </option>
+
+                        <option value="expense">
+                            Pengeluaran
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Kategori</label>
+
+                    <select id="transactionCategory">
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Akun</label>
+
+                    <select id="transactionAccount">
+
+                        <option value="">
+                            Tidak terkait akun
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Jumlah Robux</label>
+
+                    <input
+                        type="number"
+                        id="transactionRobux"
+                        min="0"
+                        placeholder="0"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Nominal</label>
+
+                    <input
+                        type="number"
+                        id="transactionAmount"
+                        min="0"
+                        placeholder="Rp 0"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Metode</label>
+
+                    <select id="transactionMethod">
+
+                        <option>
+                            Bank
+                        </option>
+
+                        <option>
+                            E-Wallet
+                        </option>
+
+                        <option>
+                            Giftcard
+                        </option>
+
+                        <option>
+                            Gamepass
+                        </option>
+
+                        <option>
+                            Payout
+                        </option>
+
+                        <option>
+                            Cash
+                        </option>
+
+                        <option>
+                            Lainnya
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>Keterangan</label>
+
+                    <input
+                        type="text"
+                        id="transactionNote"
+                        placeholder="Contoh: Pembelian Robux"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="closeTransactionModal()"
+                >
+                    Batal
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Simpan Transaksi
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
